@@ -1,27 +1,36 @@
 import React from 'react';
 import {Switch} from './Switch'
+import { ToggleContext } from './index'
 
 class Toggle extends React.Component {
-  state = {on: false}
+ 
   static defaultProps = {onToggle: () => {}}
-  static On = ({ on, children }) => on ? children : null
-  static Off = ({ on, children }) => on ? null : children
-  static Button = ({on, toggle, ...props}) => {
-    return <Switch on={on} onClick={toggle} {...props} />
-  }
-  toggle = () => {
-    this.setState(({on}) => ({on: !on}), () => {
-      this.props.onToggle(this.state.on)
-    })
-  }
+  static On = ({ children }) => (
+    <ToggleContext.Consumer>
+      { value => {
+        const {on} = value;
+        return on ? children : null
+      }}
+    </ToggleContext.Consumer>
+  )
+  static Off = ({ children }) => (
+    <ToggleContext.Consumer>
+      {value => {
+        const { on } = value;
+        return on ? null : children
+      }}
+    </ToggleContext.Consumer>
+  )
+  static Button = ({props}) => (
+    <ToggleContext.Consumer>
+      {value => {
+        const { on, toggle } = value;
+        return <Switch on={on} onClick={toggle} {...props} />
+      }}
+    </ToggleContext.Consumer>
+  )
   render() {
-    const children = React.Children.map(this.props.children, (child) => {
-      return React.cloneElement(child, {
-        on: this.state.on,
-        toggle: this.toggle
-      })
-    })
-    return <div>{children}</div>
+    return <div>{this.props.children}</div>
   }
 }
 
