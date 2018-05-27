@@ -1,56 +1,25 @@
-import React from "react";
-import { render } from "react-dom";
-import Toggle from "./Toggle";
-export const ToggleContext = React.createContext();
+import React from 'react';
+import { render } from 'react-dom';
+import Toggle from './Toggle';
+import { Switch } from "./Switch";
 
-const styles = {
-  'font-family': 'Arial',
-  'font-size': '24px',
-  'color': '#222528'
-}
-
-class ToggleProvider extends React.Component {
-  state = { on: false };
-  static defaultProps = {
-    onToggle: () => {}
-  };
-  render() {
-    return (
-      <ToggleContext.Provider
-        value={{
-          on: this.state.on,
-          toggle: () => {
-            this.setState(
-              ({ on }) => ({ on: !on }),
-              () => {
-                this.props.onToggle(this.state.on);
-              }
-            );
-          }
-        }}
-      >
-        {this.props.children}
-      </ToggleContext.Provider>
-    );
-  }
-}
+const On = ({ on, children }) => (on ? children : null);
+const Off = ({ on, children }) => (on ? null : children);
+const Button = ({ on, toggle, ...props }) => {
+  return <Switch on={on} onClick={toggle} {...props} />;
+};
 
 const App = () => (
-  
-  <ToggleProvider>
-    <Toggle>
-      <Toggle.Button />
-      <div style={styles}>
-      <Toggle.On>
-        <p>The switch is on</p>
-      </Toggle.On>
-      <Toggle.Off>
-        <p>The switch is off</p>
-      </Toggle.Off>
-      </div>
-    </Toggle>
-  </ToggleProvider>
-  
+  <Toggle>
+  {({on, toggle}) => (
+    <React.Fragment>
+      <Button on={on} toggle={toggle} />
+      <On on={on}><p>The switch is on</p></On>
+      <Off on={on}><p>The switch is off</p></Off>
+    </React.Fragment>
+  )} 
+  </Toggle>
+    
 );
 
-render(<App />, document.getElementById("root"));
+render(<App />, document.getElementById('root'));
